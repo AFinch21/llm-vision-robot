@@ -1,0 +1,25 @@
+services:
+  livekit:
+    build:
+      context: .
+      args:
+      - LIVEKIT_API_SECRET
+      - LIVEKIT_API_KEY
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yaml
+    ports:
+      - "7880:7880"
+      - "40000-40100:40000-40100/udp"
+    env_file:
+      - ./.env
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+      - ./certs:/certs
+    profiles: [lk]
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    profiles: [lk-sip]
+    

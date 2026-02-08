@@ -1,0 +1,19 @@
+[project]
+name = "llm-vision-robot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "livekit-agents[silero,turn-detector]~=1.2",
+    "livekit-plugins-openai~=1.0",
+    "livekit>=1.0.25",
+    "faster-whisper>=1.0.0",
+    "piper-tts>=1.2.0",
+    "numpy>=1.24.0",
+    "python-dotenv>=1.0.0",
+    "torch>=2.0.0", # Provides CUDA 12 libraries for faster-whisper
+    "ffmpeg>=1.4",
+    "mlx-audio>=0.2.10",
+]

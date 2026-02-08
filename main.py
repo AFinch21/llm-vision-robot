@@ -44,6 +44,10 @@ tts = PiperTTS(
 
 # --- Local LLM Endpoint (Ollama) ----------------
 # This will call Ollama as if it were an OpenAI API server
+# llm = lk_openai.LLM.with_ollama(
+#     model="qwen3-vl:8b"
+# )
+
 llm = lk_openai.LLM.with_ollama(
     model="llama3.1:8b"
 )
@@ -55,9 +59,12 @@ class Robot(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions="""You are a helpful Robot.
+            Do not think - provide answers immediately.
             You eagerly assist users with their questions by providing information from your extensive knowledge.
             Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-            You are curious, friendly, and have a sense of humor.""",
+            You are curious, friendly, and have a sense of humor.
+            Do not think - provide answers immediately.
+            """,
         )
 
     @function_tool()

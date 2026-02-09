@@ -9,6 +9,7 @@ from livekit.plugins import silero
 from livekit.plugins import openai as lk_openai
 from livekit.plugins import silero
 
+from src.agents.robot import Robot
 from src.pipelines.stt.whisper_stt import FasterWhisperSTT
 from src.pipelines.stt.parakeet_mlx_stt import ParakeetMLX
 from src.pipelines.stt.whisper_mlx_stt import WhisperMLX
@@ -55,35 +56,6 @@ llm = lk_openai.LLM.with_ollama(
 # # --- VAD (optional) -----------------------------
 vad = silero.VAD.load()
 
-class Robot(Agent):
-    def __init__(self) -> None:
-        super().__init__(
-            instructions="""You are a helpful Robot.
-            Do not think - provide answers immediately.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-            You are curious, friendly, and have a sense of humor.
-            Do not think - provide answers immediately.
-            """,
-        )
-
-    @function_tool()
-    async def lookup_weather(
-        self,
-        context: RunContext,
-        location: str,
-    ) -> dict[str]:
-        """Look up weather information for a given location.
-        
-        Args:
-            location: The location to look up weather information for.
-        """
-        weather = {
-            "London": "sunny",
-            "New York": "rainy",
-            "Unknown": "unknown",
-        }
-        return {"location": location, "weather": weather[location], "temperature_f": 70}
 
 # --- Set up the LiveKit AgentSession -----------
 server = AgentServer()

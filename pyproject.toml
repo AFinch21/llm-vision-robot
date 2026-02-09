@@ -16,4 +16,8 @@ dependencies = [
     "torch>=2.0.0", # Provides CUDA 12 libraries for faster-whisper
     "ffmpeg>=1.4",
     "mlx-audio>=0.2.10",
+    "ipykernel>=7.2.0",
+    "matplotlib>=3.10.8",
+    "pyvips>=3.1.1",
+    "accelerate>=1.12.0",
 ]

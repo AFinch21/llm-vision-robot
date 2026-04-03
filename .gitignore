@@ -18,3 +18,5 @@ local_models/
 # livekit
 livekit.yaml
 certs/
+
+/CTranslate2

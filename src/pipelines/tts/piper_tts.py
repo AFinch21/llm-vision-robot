@@ -6,6 +6,7 @@ Local text-to-speech using Piper with optional GPU acceleration.
 No cloud APIs required - runs entirely on your hardware.
 
 Features:
+    - Sentence-level streaming for low perceived latency
     - Fast CPU-based synthesis
     - Optional GPU acceleration (CUDA version dependent)
     - Multiple voice models available
@@ -35,12 +36,12 @@ Example:
 from __future__ import annotations
 
 import asyncio
-import io
 import logging
 import time
 import uuid
-import wave
 from typing import TYPE_CHECKING
+
+import numpy as np
 
 from livekit.agents import tts, APIConnectOptions
 
@@ -56,8 +57,10 @@ class _PiperChunkedStream(tts.ChunkedStream):
     """
     Internal ChunkedStream implementation for Piper TTS.
 
-    Handles the async bridge between LiveKit's streaming interface
-    and Piper's synchronous synthesis.
+    Uses Piper's built-in sentence-level generator: voice.synthesize() yields
+    one AudioChunk per sentence. Each chunk is converted to int16 PCM and
+    pushed to the emitter immediately, so audio starts playing after the
+    first sentence is synthesized rather than waiting for the full text.
     """
 
     def __init__(
@@ -71,7 +74,6 @@ class _PiperChunkedStream(tts.ChunkedStream):
         self._piper_tts = tts_plugin
 
     async def _run(self, emitter: AudioEmitter) -> None:
-        """Synthesize audio and emit it to LiveKit."""
         emitter.initialize(
             request_id=str(uuid.uuid4()),
             sample_rate=self._piper_tts.sample_rate,
@@ -79,25 +81,32 @@ class _PiperChunkedStream(tts.ChunkedStream):
             mime_type="audio/pcm",
         )
 
-        # Run blocking synthesis in thread pool
-        start_time = time.perf_counter()
         loop = asyncio.get_running_loop()
-        audio_bytes = await loop.run_in_executor(
+        overall_start = time.perf_counter()
+
+        chunks = await loop.run_in_executor(
             None,
-            self._synthesize_blocking,
-            self._input_text
+            self._synthesize_all_chunks,
+            self._input_text,
         )
-        elapsed_ms = (time.perf_counter() - start_time) * 1000
 
-        logger.debug(f"TTS latency: {elapsed_ms:.0f}ms for {len(self._input_text)} chars")
+        for i, pcm_bytes in enumerate(chunks):
+            emitter.push(pcm_bytes)
+            logger.debug(
+                "TTS chunk %d/%d (%d bytes) emitted",
+                i + 1, len(chunks), len(pcm_bytes),
+            )
 
-        emitter.push(audio_bytes)
+        total_ms = (time.perf_counter() - overall_start) * 1000
+        logger.debug("TTS total: %.0fms for %d chars", total_ms, len(self._input_text))
 
-    def _synthesize_blocking(self, text: str) -> bytes:
+    def _synthesize_all_chunks(self, text: str) -> list[bytes]:
         """
-        Blocking synthesis operation.
+        Synthesize text using Piper's sentence-level generator.
 
-        Runs in a thread pool to avoid blocking the async event loop.
+        voice.synthesize() internally splits text into sentences and yields
+        one AudioChunk per sentence with float32 audio. We convert each to
+        int16 PCM bytes for LiveKit.
         """
         from piper.config import SynthesisConfig
 
@@ -108,22 +117,13 @@ class _PiperChunkedStream(tts.ChunkedStream):
             volume=self._piper_tts.volume,
         )
 
-        # Synthesize to WAV in memory
-        wav_io = io.BytesIO()
-        with wave.open(wav_io, "wb") as wav_file:
-            self._piper_tts.voice.synthesize_wav(
-                text,
-                wav_file,
-                syn_config=syn_config,
-                set_wav_format=True
-            )
+        pcm_chunks = []
+        for audio_chunk in self._piper_tts.voice.synthesize(text, syn_config=syn_config):
+            audio_f32 = audio_chunk.audio_float_array
+            audio_i16 = (audio_f32 * 32767).astype(np.int16)
+            pcm_chunks.append(audio_i16.tobytes())
 
-        # Extract raw PCM frames from WAV
-        wav_io.seek(0)
-        with wave.open(wav_io, "rb") as wav_file:
-            frames = wav_file.readframes(wav_file.getnframes())
-
-        return frames
+        return pcm_chunks
 
 
 class PiperTTS(tts.TTS):
@@ -177,7 +177,6 @@ class PiperTTS(tts.TTS):
     ) -> None:
         from piper.voice import PiperVoice
 
-        # Piper models typically output 22050 Hz mono audio
         super().__init__(
             capabilities=tts.TTSCapabilities(streaming=False),
             sample_rate=22050,

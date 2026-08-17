@@ -1,22 +1,47 @@
 import time
 import Jetson.GPIO as GPIO
 
-def main():
-    pins = [7, 11, 13, 15]
-    GPIO.setmode(GPIO.BOARD)
-    for pin in pins:
-        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
-    try:
-        while True:
-            for pin in pins:
-                print(f"Pin {pin} HIGH")
-                GPIO.output(pin, GPIO.HIGH)
-                time.sleep(1)
-                print(f"Pin {pin} LOW")
-                GPIO.output(pin, GPIO.LOW)
-                time.sleep(1)
-    finally:
-        GPIO.cleanup()
+IN1, IN2, IN3, IN4 = 7, 11, 13, 15
+PINS = (IN1, IN2, IN3, IN4)
+battery_disconnected = False
 
-if __name__ == "__main__":
-    main()
+def set_outputs(states):
+    for pin, state in zip(PINS, states):
+        GPIO.output(pin, state)
+
+def stop():
+    set_outputs((GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.LOW))
+
+def pulse(label, states):
+    print(f"\n{label} — running for 1 second")
+    set_outputs(states)
+    time.sleep(1)
+    stop()
+    print("STOP")
+    time.sleep(1)
+
+GPIO.setmode(GPIO.BOARD)
+for pin in PINS:
+    GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+
+try:
+    stop()
+    input(
+        "\nAll inputs are LOW. Connect the motor battery, "
+        "keep the tracks raised, then press Enter..."
+    )
+
+    pulse("Motor A — direction 1", (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.LOW))
+    pulse("Motor A — direction 2", (GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.LOW))
+    pulse("Motor B — direction 1", (GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.LOW))
+    pulse("Motor B — direction 2", (GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.HIGH))
+
+    stop()
+    input("\nTests finished. Disconnect the motor battery, then press Enter...")
+    battery_disconnected = True
+finally:
+    stop()
+    if not battery_disconnected:
+        input("\nSTOP asserted. Disconnect the motor battery, then press Enter...")
+    GPIO.cleanup()
+    print("GPIO cleaned up safely.")

@@ -1694,6 +1694,12 @@ wheels = [
 ]
 
 [[package]]
+name = "jetson-gpio"
+version = "2.1.13"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ab/02/bc497bd9aabf390785bac5feeeb3e070e539912ed835ff3b41daa3c7c1fb/jetson_gpio-2.1.13.tar.gz", hash = "sha256:45d4b1de074497d51227929e654bd51bf7fd96f006a7be702dc07a78968a8b66", size = 37716, upload-time = "2026-07-27T15:22:40.664Z" }
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -2138,6 +2144,7 @@ dependencies = [
     { name = "faster-whisper" },
     { name = "ffmpeg" },
     { name = "ipykernel" },
+    { name = "jetson-gpio" },
     { name = "livekit" },
     { name = "livekit-agents", extra = ["silero", "turn-detector"] },
     { name = "livekit-plugins-openai" },
@@ -2159,6 +2166,7 @@ requires-dist = [
     { name = "faster-whisper", specifier = ">=1.0.0" },
     { name = "ffmpeg", specifier = ">=1.4" },
     { name = "ipykernel", specifier = ">=7.2.0" },
+    { name = "jetson-gpio", specifier = ">=2.1.13" },
     { name = "livekit", specifier = ">=1.0.25" },
     { name = "livekit-agents", extras = ["silero", "turn-detector"], specifier = "~=1.2" },
     { name = "livekit-plugins-openai", specifier = "~=1.0" },
@@ -4752,8 +4760,8 @@ name = "standard-aifc"
 version = "3.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
-    { name = "standard-chunk", marker = "python_full_version >= '3.13'" },
+    { name = "audioop-lts" },
+    { name = "standard-chunk" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c4/53/6050dc3dde1671eb3db592c13b55a8005e5040131f7509cef0215212cb84/standard_aifc-3.13.0.tar.gz", hash = "sha256:64e249c7cb4b3daf2fdba4e95721f811bde8bdfc43ad9f936589b7bb2fae2e43", size = 15240, upload-time = "2024-10-30T16:01:31.772Z" }
 wheels = [
@@ -4774,7 +4782,7 @@ name = "standard-sunau"
 version = "3.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
+    { name = "audioop-lts" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/e3/ce8d38cb2d70e05ffeddc28bb09bad77cfef979eb0a299c9117f7ed4e6a9/standard_sunau-3.13.0.tar.gz", hash = "sha256:b319a1ac95a09a2378a8442f403c66f4fd4b36616d6df6ae82b8e536ee790908", size = 9368, upload-time = "2024-10-30T16:01:41.626Z" }
 wheels = [

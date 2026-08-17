@@ -58,9 +58,9 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
         
-        forward_pin_state = (GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW)
+        left_pin_state = (GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
 
-        self.pulse_motors(forward_pin_state)
+        self.pulse_motors(left_pin_state)
 
     def turn_right(self):
         """
@@ -68,9 +68,9 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
         
-        forward_pin_state = (GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.HIGH)
+        right_pin_state = (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH)
 
-        self.pulse_motors(forward_pin_state)
+        self.pulse_motors(right_pin_state)
 
 if __name__ == "__main__":
 
@@ -83,6 +83,12 @@ if __name__ == "__main__":
 
     time.sleep(1)
     mc.move_backward()
+
+    time.sleep(1)
+    mc.turn_left()
+
+    time.sleep(1)
+    mc.turn_right()
 
     time.sleep(1)
     mc.stop()

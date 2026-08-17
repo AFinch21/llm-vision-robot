@@ -31,10 +31,10 @@ try:
         "keep the tracks raised, then press Enter..."
     )
 
-    pulse("Motor A — direction 1", (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.LOW))
-    pulse("Motor A — direction 2", (GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.LOW))
-    pulse("Motor B — direction 1", (GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.LOW))
-    pulse("Motor B — direction 2", (GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.HIGH))
+    pulse("Motor A — FORWARD", (GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW))
+    pulse("Motor A — BACKWARD", (GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.HIGH))
+    pulse("Motor B — LEFT", (GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW))
+    pulse("Motor B — RIGHT", (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH))
 
     stop()
     input("\nTests finished. Disconnect the motor battery, then press Enter...")

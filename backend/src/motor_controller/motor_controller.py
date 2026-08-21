@@ -22,12 +22,13 @@ class MotorController:
         """
         Lazily import self.gpio - we not be able to on mac
         """
+        print("importing gpio")
         try:
-            import Jetson.self.gpio as GPIO
-            logger.info("self.gpio import available, setting self.gpio")
+            import Jetson.GPIO as GPIO
+            print("self.gpio import available, setting self.gpio")
             return GPIO
-        except:
-            logger.info("No self.gpio available")
+        except Exception as e:
+            print(f"No self.gpio available, error: {e}")
             
 
     def parse_ws_event(self, event: str) -> None:

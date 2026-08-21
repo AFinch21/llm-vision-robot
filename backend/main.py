@@ -3,6 +3,9 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 
+
+from src.motor_controller import motor_controller
+
 app = FastAPI()
 frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "tomoro-bot" / "dist"
 
@@ -14,6 +17,9 @@ async def health_check():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+
+    mc = motor_controller.MotorController()
+
     await websocket.accept()
     try:
         while True:

@@ -1,5 +1,4 @@
 import time
-import Jetson.GPIO as GPIO
 
 import logging
 
@@ -11,12 +10,54 @@ class MotorController:
     """
     pins = (7, 11, 13, 15)
 
-    def __init__(self, gpio):
-        self.gpio = gpio
-        gpio.setmode(gpio.BOARD)
+    def __init__(self):
+        self.gpio = self.get_gpio()
+        self.gpio.setmode(self.gpio.BOARD)
 
         for pin in self.pins:
-            gpio.setup(pin, gpio.OUT, initial=gpio.LOW)
+            self.gpio.setup(pin, self.gpio.OUT, initial=self.gpio.LOW)
+
+    @staticmethod
+    def get_gpio() -> None:
+        """
+        Lazily import GPIO - we not be able to on mac
+        """
+        try:
+            import Jetson.GPIO as GPIO
+            logger.info("GPIO import available, setting GPIO")
+        except:
+            logger.info("No GPIO available")
+            
+
+    def parse_ws_event(self, event: str) -> None:
+        """
+        This function consumes websocket events from the server.
+        It checks if the movement is a stop command, then checks if the 
+        command is one of the directions we support.
+        If it's not supported, we throw a warning and stop.
+        The ws should send a stop command on button up - so we should get 
+        away with just setting the GPIO values and waiting for the stop command
+        """
+
+        if event["type"] == "stop_movement":
+            self.stop()
+            return
+        
+        commands = {
+            "forward" : self.move_forward,
+            "backward" : self.move_backward,
+            "right" : self.turn_right,
+            "left" : self.turn_left
+        }
+
+        try:
+            commands[event["direction"]]()
+        except:
+            self.stop()
+            logger.warning(f"Unregistered direction command parsed from websocket: {event["direction"]}")
+
+
+
 
     def pulse_motors(self, motor_states: tuple) -> None:
         """

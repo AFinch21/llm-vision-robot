@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 class MotorController:
     """
-    Controls the motors using GPIO to create motion
+    Controls the motors using self.gpio to create motion
     """
     pins = (7, 11, 13, 15)
 
@@ -20,13 +20,14 @@ class MotorController:
     @staticmethod
     def get_gpio() -> None:
         """
-        Lazily import GPIO - we not be able to on mac
+        Lazily import self.gpio - we not be able to on mac
         """
         try:
-            import Jetson.GPIO as GPIO
-            logger.info("GPIO import available, setting GPIO")
+            import Jetson.self.gpio as GPIO
+            logger.info("self.gpio import available, setting self.gpio")
+            return GPIO
         except:
-            logger.info("No GPIO available")
+            logger.info("No self.gpio available")
             
 
     def parse_ws_event(self, event: str) -> None:
@@ -36,7 +37,7 @@ class MotorController:
         command is one of the directions we support.
         If it's not supported, we throw a warning and stop.
         The ws should send a stop command on button up - so we should get 
-        away with just setting the GPIO values and waiting for the stop command
+        away with just setting the self.gpio values and waiting for the stop command
         """
 
         if event["type"] == "stop_movement":
@@ -64,7 +65,7 @@ class MotorController:
         Pulse the motors in a certain direction
         """
         for pin, state in zip(self.pins, motor_states):
-            GPIO.output(pin, state)
+            self.gpio.output(pin, state)
 
     def stop(self):
         """
@@ -79,7 +80,7 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
 
-        forward_pin_state = (GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW)
+        forward_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW)
 
         self.pulse_motors(forward_pin_state)
 
@@ -89,7 +90,7 @@ class MotorController:
         """
         logger.info("Pulsing motors backward...")
         
-        backward_pin_state = (GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.HIGH)
+        backward_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH)
 
         self.pulse_motors(backward_pin_state)
 
@@ -99,7 +100,7 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
         
-        left_pin_state = (GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
+        left_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.HIGH, self.gpio.LOW)
 
         self.pulse_motors(left_pin_state)
 
@@ -109,13 +110,13 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
         
-        right_pin_state = (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH)
+        right_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.LOW, self.gpio.HIGH)
 
         self.pulse_motors(right_pin_state)
 
 if __name__ == "__main__":
 
-    mc = MotorController(GPIO)
+    mc = MotorController()
     time.sleep(1)
     mc.stop()
 

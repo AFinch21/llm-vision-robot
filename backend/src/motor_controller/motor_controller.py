@@ -12,10 +12,11 @@ class MotorController:
 
     def __init__(self):
         self.gpio = self.get_gpio()
-        self.gpio.setmode(self.gpio.BOARD)
+        if self.gpio:
+            self.gpio.setmode(self.gpio.BOARD)
 
-        for pin in self.pins:
-            self.gpio.setup(pin, self.gpio.OUT, initial=self.gpio.LOW)
+            for pin in self.pins:
+                self.gpio.setup(pin, self.gpio.OUT, initial=self.gpio.LOW)
 
     @staticmethod
     def get_gpio() -> None:

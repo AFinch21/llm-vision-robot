@@ -73,38 +73,45 @@ class MotorController:
         """
         Stops all pins and stops motors
         """
-        for pin in self.pins:
-            self.gpio.output(pin, self.gpio.LOW)
+        print("Stopping motors...")
+        if self.gpio:
+            for pin in self.pins:
+                self.gpio.output(pin, self.gpio.LOW)
 
     def move_forward(self):
         """
         Set pins 7 and 13 to high go forward
         """
-        logger.info("Pulsing motors forward...")
+        print("Pulsing motors forward...")
 
-        forward_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW)
+        if self.gpio:
+            forward_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW)
 
-        self.pulse_motors(forward_pin_state)
+            self.pulse_motors(forward_pin_state)
 
     def move_backward(self):
         """
         Set pins 11 and 15 to high go backward
         """
         logger.info("Pulsing motors backward...")
+        print("Pulsing motors backward...")
         
-        backward_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH)
+        if self.gpio:
+            backward_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.LOW, self.gpio.HIGH)
 
-        self.pulse_motors(backward_pin_state)
+            self.pulse_motors(backward_pin_state)
 
     def turn_left(self):
         """
         Set pins 7 and 13 to high go forward
         """
-        logger.info("Pulsing motors forward...")
-        
-        left_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.HIGH, self.gpio.LOW)
+        logger.info("Pulsing motors left...")
+        print("Pulsing motors left...")
 
-        self.pulse_motors(left_pin_state)
+        if self.gpio:
+            left_pin_state = (self.gpio.LOW, self.gpio.HIGH, self.gpio.HIGH, self.gpio.LOW)
+
+            self.pulse_motors(left_pin_state)
 
     def turn_right(self):
         """
@@ -112,9 +119,10 @@ class MotorController:
         """
         logger.info("Pulsing motors forward...")
         
-        right_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.LOW, self.gpio.HIGH)
+        if self.gpio:
+            right_pin_state = (self.gpio.HIGH, self.gpio.LOW, self.gpio.LOW, self.gpio.HIGH)
 
-        self.pulse_motors(right_pin_state)
+            self.pulse_motors(right_pin_state)
 
 if __name__ == "__main__":
 

@@ -1,5 +1,5 @@
 import time
-
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,10 +29,10 @@ class MotorController:
             print("self.gpio import available, setting self.gpio")
             return GPIO
         except Exception as e:
-            print(f"No self.gpio available, error: {e}")
+            print(f"No self.gpio available for this hardware, error: {e}")
             
 
-    def parse_ws_event(self, event: str) -> None:
+    def parse_ws_event(self, ws_event: str) -> None:
         """
         This function consumes websocket events from the server.
         It checks if the movement is a stop command, then checks if the 
@@ -41,6 +41,8 @@ class MotorController:
         The ws should send a stop command on button up - so we should get 
         away with just setting the self.gpio values and waiting for the stop command
         """
+
+        event = json.loads(ws_event)
 
         if event["type"] == "stop_movement":
             self.stop()

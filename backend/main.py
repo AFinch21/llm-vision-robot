@@ -25,6 +25,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             print(f"Received message: {data}")
+            mc.parse_ws_event(data)
             await websocket.send_text(f"You sent: {data}")
     except WebSocketDisconnect:
         print("WebSocket disconnected")
